@@ -8,4 +8,4 @@ editor_options:
 ---
 
 Describe your project.
-Check out my [PCA](WorkflowrTutorial.Rmd)
+Check out my [PCA](WorkflowrTutorial.html)
