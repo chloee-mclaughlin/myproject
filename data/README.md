@@ -1,3 +1,3 @@
 # Data
 
-Save raw data files here.
+wflow_publish()
