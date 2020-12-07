@@ -46,10 +46,48 @@ Biplot
 ##test for only founders
 fviz_pca_biplot(env.pc,
                 axes= c(1,2),
-                col.var = "yellow", alpha=.8, # Variables color
+                col.var = "blue", alpha=.8, # Variables color and transparency
                 col.ind = "black",
                 label = "var", # Individuals color,
                 legend.title = "Races"
 )
 
+```
+
+Isolate founder races and see environment
+```{r}
+##Making dataframe with only founder races
+found.env.dat <- all.acc[all.acc$Race %in% c("CONICO","GORDO","JALA","NALTEL","PALOME",
+                                                     "REVENT","TABLON","ZAPCHI"), ]
+
+###PC, removing NAs and setting categorical variables
+found.env.dat <-na.omit(found.env.dat)
+active.found <-found.env.dat[,6:142]
+active.found.cat <- found.env.dat[,1:5]
+
+##Run PCA for only MAGIC founders
+found.pc <- dudi.pca(active.found,
+                    scannf = FALSE,   # Hide scree plot
+                    nf = 10           # Number of components kept in the results
+                   )
+
+#using races as a grouping factor
+race<-active.found.cat$Race
+
+fviz_pca_ind(found.pc,
+             axes=c(1,2),
+             col.ind = as.factor(race),
+             geom = "point",
+                    palette = c("#2586CC","#337C61","#E1C34A","#D8904F","#725E5E", "#F0B3A2",
+                                "#88CF56", "#A44638"),
+             alpha=.6,
+                    addEllipses = TRUE, # Concentration ellipses
+                    ellipse.type = c("norm"),
+                    legend.title = "Race")
+                    #repel = TRUE)
+```
+Look at just soil traits (all FOAM genotypes)
+```{r}
+FOAM <- read.csv("data/Maize_Accessions_climate_drought_soil_clean_data_12220.csv")
+dim(FOAM)
 ```
