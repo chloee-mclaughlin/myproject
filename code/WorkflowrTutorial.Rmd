@@ -1,0 +1,113 @@
+---
+title: "workflowr tutorial"
+output: html_notebook
+---
+
+```{r}
+
+library()
+library(ade4)
+library(factoextra)
+library(magrittr)
+
+setwd("~/OneDrive - The Pennsylvania State University/Research/myproject/")
+
+
+##all accessions
+waypoint <- read.delim("code/maiz_clim_all", sep=",")
+all.acc.dat <- cbind (ro$ID, ro$Race, ro$Founder, waypoint)
+names(all.acc.dat)[1]<- "ID"
+names(all.acc.dat)[2]<- "Race"
+names(all.acc.dat)[3]<- "Founder"
+all.acc.dat$X.1<- NULL
+all.acc.dat$X <- NULL
+
+sol <- read.csv("code/soil_traits.csv")
+all.acc<- cbind(all.acc.dat, sol[,5:25])
+
+##for PC data
+active.env <- na.omit(all.acc)
+active.env <- active.env[,6:120]
+##categorical that matches PC individuals 
+active.env.cat <- na.omit(all.acc)
+active.env.cat <- active.env.cat[,1:5]
+
+env.pc <- dudi.pca(active.env,
+                    scannf = FALSE,   # Hide scree plot
+                    nf = 10           # Number of components kept in the results
+                   )
+
+##scree plot
+fviz_eig(env.pc)
+
+##representation of individuals
+fviz_pca_ind(env.pc,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+             )
+
+##represntation of variables
+fviz_pca_var(red.env.pc,
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+             )
+
+##test for only founders
+fviz_pca_biplot(env.pc,
+                axes= c(1,2),
+                col.var = "yellow", alpha=.8, # Variables color
+                col.ind = "black",
+
+                label = "var", # Individuals color,
+                legend.title = "Races"
+)
+
+founders.pc<-test.pc[c(37,96,248,253,388,743,1623,1738),]
+
+founders.plot <-fviz_pca_ind(founders.pc,
+                             )
+
+##Individuals
+
+groups <- as.factor(active.env.cat$Race)
+fviz_pca_ind(red.env.pc,
+             axes = c(2,3),
+             col.ind = groups, # color by groups 
+             label = "none",
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "norm",
+             legend.title = "Race",
+             repel = TRUE
+             )
+##predict founders 
+found.coord <- suprow(env.pc, found.act) %>% .$lisup
+
+ind.sup.coord[, 1:4]
+
+founders <- active.env.cat[which(active.env.cat$Founder=='Y'),]
+
+p <-fviz_pca_ind(env.pc,
+             col.ind = groups, # color by groups 
+             select.ind = active.env.cat[which(active.env.cat$Founder=='Y'),],
+             label = "none",
+             palette = c("red","orange", "yellow", "green", "darkgreen","blue", "lightblue", "purple"),
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Races",
+             repel = TRUE
+             )
+
+groups.f <- as.factor(active.env.cat$Founder)
+f <-fviz_pca_ind(env.pc,
+                 dim,
+                 col.ind = groups.f, # color by founder 
+                 label = "none",
+                 palette = c("white","black"), alpha=0.5,
+                 legend.title = "Founder",
+                 repel = TRUE
+                 )
+```
+
+
