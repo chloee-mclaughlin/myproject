@@ -509,16 +509,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomchloeemclaughlinmyprojecttree313c1032390f8142e7d67666b114576a4168c2a2targetblank313c103a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/chloee-mclaughlin/myproject/tree/313c1032390f8142e7d67666b114576a4168c2a2" target="_blank">313c103</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomchloeemclaughlinmyprojecttreea72b19652a5252588ab214bdb7db50e577f00f92targetblanka72b196a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/chloee-mclaughlin/myproject/tree/a72b19652a5252588ab214bdb7db50e577f00f92" target="_blank">a72b196</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomchloeemclaughlinmyprojecttree313c1032390f8142e7d67666b114576a4168c2a2targetblank313c103a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomchloeemclaughlinmyprojecttreea72b19652a5252588ab214bdb7db50e577f00f92targetblanka72b196a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/chloee-mclaughlin/myproject/tree/313c1032390f8142e7d67666b114576a4168c2a2" target="_blank">313c103</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/chloee-mclaughlin/myproject/tree/a72b19652a5252588ab214bdb7db50e577f00f92" target="_blank">a72b196</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -532,7 +532,8 @@ Ignored files:
     Ignored:    data/.DS_Store
 
 Untracked files:
-    Untracked:  WorkflowRTutoiral.R
+    Untracked:  WorkflowRTutorial.R
+    Untracked:  data/Maize_Accessions_climate_drought_soil_clean_data_12220.csv
     Untracked:  data/all.acc.csv
     Untracked:  data/allLines_with_GID_includes_founders.csv
     Untracked:  data/maiz_clim_all
@@ -575,6 +576,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/chloee-mclaughlin/myproject/blob/a72b19652a5252588ab214bdb7db50e577f00f92/analysis/WorkflowrTutorial.Rmd" target="_blank">a72b196</a>
+</td>
+<td>
+Chloee McLaughlin
+</td>
+<td>
+2020-12-07
+</td>
+<td>
+Publish the PCA analysis-updated 12/7/20
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/chloee-mclaughlin/myproject/fdd6227446066043621251fd4ef9c2cc98baaa46/docs/WorkflowrTutorial.html" target="_blank">fdd6227</a>
+</td>
+<td>
+Chloee McLaughlin
+</td>
+<td>
+2020-12-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -819,7 +854,7 @@ Chloee McLaughlin
 <pre class="r"><code>##test for only founders
 fviz_pca_biplot(env.pc,
                 axes= c(1,2),
-                col.var = &quot;yellow&quot;, alpha=.8, # Variables color
+                col.var = &quot;blue&quot;, alpha=.8, # Variables color and transparency
                 col.ind = &quot;black&quot;,
                 label = &quot;var&quot;, # Individuals color,
                 legend.title = &quot;Races&quot;
@@ -862,6 +897,41 @@ Chloee McLaughlin
 </table>
 </div>
 </div>
+<p>Isolate founder races and see environment</p>
+<pre class="r"><code>##Making dataframe with only founder races
+found.env.dat &lt;- all.acc[all.acc$Race %in% c(&quot;CONICO&quot;,&quot;GORDO&quot;,&quot;JALA&quot;,&quot;NALTEL&quot;,&quot;PALOME&quot;,
+                                                     &quot;REVENT&quot;,&quot;TABLON&quot;,&quot;ZAPCHI&quot;), ]
+
+###PC, removing NAs and setting categorical variables
+found.env.dat &lt;-na.omit(found.env.dat)
+active.found &lt;-found.env.dat[,6:142]
+active.found.cat &lt;- found.env.dat[,1:5]
+
+##Run PCA for only MAGIC founders
+found.pc &lt;- dudi.pca(active.found,
+                    scannf = FALSE,   # Hide scree plot
+                    nf = 10           # Number of components kept in the results
+                   )
+
+#using races as a grouping factor
+race&lt;-active.found.cat$Race
+
+fviz_pca_ind(found.pc,
+             axes=c(1,2),
+             col.ind = as.factor(race),
+             geom = &quot;point&quot;,
+                    palette = c(&quot;#2586CC&quot;,&quot;#337C61&quot;,&quot;#E1C34A&quot;,&quot;#D8904F&quot;,&quot;#725E5E&quot;, &quot;#F0B3A2&quot;,
+                                &quot;#88CF56&quot;, &quot;#A44638&quot;),
+             alpha=.6,
+                    addEllipses = TRUE, # Concentration ellipses
+                    ellipse.type = c(&quot;norm&quot;),
+                    legend.title = &quot;Race&quot;)</code></pre>
+<p><img src="figure/WorkflowrTutorial.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>                    #repel = TRUE)</code></pre>
+<p>Look at just soil traits (all FOAM genotypes)</p>
+<pre class="r"><code>FOAM &lt;- read.csv(&quot;data/Maize_Accessions_climate_drought_soil_clean_data_12220.csv&quot;)
+dim(FOAM)</code></pre>
+<pre><code>[1] 2912  225</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
